@@ -63,11 +63,21 @@ namespace SQLGenerator
                 foreach (DataColumn col in dt.Columns)
                 {
                     string columnName = col.ColumnName;
-                    string field = Convert.ToString(row[col]);
-                    //替换单引号'为两个单引号''
-                    field = field.Replace("'", "''");
+                    string field = string.Empty;
+                    //NULL特殊处理，避免全部为''导致类型转换错误
+                    if (row[col] == DBNull.Value)
+                    {
+                        field = "NULL";
+                    }
+                    else
+                    {
+                        field = Convert.ToString(row[col]);
+                        //替换单引号'为两个单引号''
+                        field = field.Replace("'", "''");
+                        field = $"'{field}'";
+                    }
 
-                    sbSql.Append($"'{field}',");
+                    sbSql.Append($"{field},");
                 }
                 sbSql.Remove(sbSql.Length - 1, 1);
                 sbSql.Append(")");
